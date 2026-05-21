@@ -34,22 +34,6 @@ public abstract class Pedido {
         itensPedido.add(item);
     }
  
-    public void listarItens() {
-        for (ItemPedido item : itensPedido) {
-            System.out.println(item);
-        }
-    }
+    
  
-    public double calcularTotal() {
-        double total = 0;
-        for (ItemPedido item : itensPedido) {
-            total += item.getProduto().getPreco() * item.getQuantidade();
-        }
-        return total;
-    }
- 
-    public String toString() {
-        return "Pedido{id=" + id + ", dataHora=" + dataHora +
-               ", estado=" + estado + ", total=" + calcularTotal() + "}";
-    }
-}
+    
