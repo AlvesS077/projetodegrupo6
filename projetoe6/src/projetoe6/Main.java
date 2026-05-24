@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 	package projetoe6;
 	
 	import java.util.Scanner;
@@ -115,6 +115,3 @@
 	        sc.close();
 	    }
 	} //..
-=======
-
->>>>>>> branch 'main' of https://github.com/AlvesS077/projetodegrupo6.git
