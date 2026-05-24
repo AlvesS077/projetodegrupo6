@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 package projetoe6;
 
 import java.util.ArrayList;
@@ -36,3 +37,6 @@ public class Menu {
         return "Menu com " + produtos.size() + " produtos.";
     }
 } //
+=======
+
+>>>>>>> branch 'main' of https://github.com/AlvesS077/projetodegrupo6.git
