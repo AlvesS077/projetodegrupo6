@@ -32,4 +32,4 @@ public class PedidoDigital extends Pedido {
         String estadoPagamento = pago ? "Pago" : "Por pagar";
         return super.toString() + " | " + estadoPagamento;
     }
-}
+} //

@@ -4,4 +4,4 @@ public enum Categoria {
     BEBIDAS,
     LANCHES,
     PETISCOS
-}
+} //

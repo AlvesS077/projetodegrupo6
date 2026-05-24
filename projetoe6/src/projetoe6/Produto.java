@@ -58,4 +58,4 @@ public class Produto {
         // Junta tudo com o símbolo + de forma direta e simples
         return "[" + id + "] " + nome + " - " + preco + "€ (" + descricao + ") [" + estado + "]";
     }
-}
+} //

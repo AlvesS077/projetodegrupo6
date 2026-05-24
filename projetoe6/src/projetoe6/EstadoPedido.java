@@ -4,4 +4,4 @@ public enum EstadoPedido {
     PENDENTE,
     EM_PREPARACAO,
     CONCLUIDO
-}
+} //
