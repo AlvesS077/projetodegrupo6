@@ -1,32 +1,35 @@
 package projetoe6;
 
+// Subclasse de Pedido que representa um pedido feito digitalmente
+// Guarda e controla apenas se o pedido ja se encontra pago
 public class PedidoDigital extends Pedido {
-	 
-    private String qrCode;
-    private boolean pago;
- 
-    public PedidoDigital(int id, String qrCode) {
-        super(id);
-        this.qrCode = qrCode;
+
+    private boolean pago; // Indica se o pedido ja foi pago
+
+    // Construtor - define o pedido inicialmente como nao pago
+    public PedidoDigital() {
+        super();
         this.pago = false;
     }
- 
-    public String getQrCode() {
-        return qrCode;
-    }
- 
+
+    // Devolve true se o pedido ja foi pago
     public boolean isPago() {
         return pago;
     }
- 
+
+    // Marca o pedido como pago e mostra uma confirmacao
     public void confirmarPagamento() {
+        if (pago) {
+            System.out.println("Este pedido ja foi pago.");
+            return;
+        }
         this.pago = true;
-        System.out.println("Pagamento confirmado para o pedido via QR Code: " + qrCode);
+        System.out.println("Pagamento confirmado para o pedido #" + getId());
     }
- 
-    @Override
+
+    // Representacao textual do pedido digital (inclui apenas o estado de pagamento)
     public String toString() {
-        return "PedidoDigital{" + super.toString() +
-               ", qrCode='" + qrCode + "', pago=" + pago + "}";
+        String estadoPagamento = pago ? "Pago" : "Por pagar";
+        return super.toString() + " | " + estadoPagamento;
     }
 }
