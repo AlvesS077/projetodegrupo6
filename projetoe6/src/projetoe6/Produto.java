@@ -41,5 +41,5 @@ public class Produto {
     public String toString() {
         return "Produto{id=" + id + ", nome='" + nome + "', preco=" + preco +
                ", categoria=" + categoria + ", disponivel=" + disponivel + "}";
-    }
+    } /**
 }
