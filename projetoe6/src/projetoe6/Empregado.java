@@ -7,7 +7,7 @@ public class Empregado extends Utilizador {
     }
 
     public void adicionarProdutoAoMenu(GerirPedidos gestor, Produto produto) {
-        gestor.adicionarProduto(produto);
+        gestor.adicionarProduto(produto); // Chama o método do gestor central
     }
 
     public String toString() {
