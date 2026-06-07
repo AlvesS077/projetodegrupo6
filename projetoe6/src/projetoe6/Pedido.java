@@ -10,12 +10,14 @@ public abstract class Pedido {
     private String dataHora;
     private EstadoPedido estado;
     private ArrayList<ItemPedido> itensPedido;
+    private String nomeCliente;  // NOVO
 
     public Pedido() {
         this.id = proximoId++;
         this.dataHora = new java.util.Date().toString();
         this.estado = EstadoPedido.PENDENTE;
         this.itensPedido = new ArrayList<ItemPedido>();
+        this.nomeCliente = "Desconhecido";  // NOVO
     }
 
     public int getId() {
@@ -32,6 +34,16 @@ public abstract class Pedido {
 
     public void setEstado(EstadoPedido estado) {
         this.estado = estado;
+    }
+
+    // NOVO
+    public String getNomeCliente() {
+        return nomeCliente;
+    }
+
+    // NOVO
+    public void setNomeCliente(String nome) {
+        this.nomeCliente = nome;
     }
 
     public void adicionarItem(ItemPedido item) {
@@ -61,6 +73,6 @@ public abstract class Pedido {
     }
 
     public String toString() {
-        return "Pedido #" + id + " | " + dataHora + " | Estado: " + estado + " | Total: " + calcularTotal() + "EUR";
+        return "Pedido #" + id + " | " + nomeCliente + " | " + dataHora + " | Estado: " + estado + " | Total: " + calcularTotal() + "EUR";
     }
-} //..
+}

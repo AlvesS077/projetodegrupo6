@@ -10,14 +10,12 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         GerirPedidos gestor = new GerirPedidos();
 
-        // E-mails pré-gravados de fábrica
         Empregado emp1 = new Empregado("gerente@gmail.com");
         gestor.registarUtilizador(emp1);
 
         gestor.registarUtilizador(new Cliente("cliente1@gmail.com"));
         gestor.registarUtilizador(new Cliente("manuel@gmail.com"));
 
-        // Carregar os produtos iniciais no sistema
         gestor.adicionarProduto(new Produto(1, "Agua",          1.00, "50cl",               Categoria.BEBIDAS));
         gestor.adicionarProduto(new Produto(2, "Sumo Laranja",  2.50, "Natural 33cl",        Categoria.BEBIDAS));
         gestor.adicionarProduto(new Produto(3, "Coca-Cola",     2.00, "Lata 33cl",           Categoria.BEBIDAS));
@@ -33,7 +31,7 @@ public class Main {
             System.out.println("=================================");
             System.out.print("Introduza o seu E-mail (ou 'sair'): ");
             String emailIntroduzido = sc.next();
-            sc.nextLine(); // Limpar buffer
+            sc.nextLine();
 
             if (emailIntroduzido.equalsIgnoreCase("sair")) {
                 continuarGeral = false;
@@ -45,15 +43,27 @@ public class Main {
             Empregado empregadoAutenticado = gestor.encontrarEmpregadoPorNome(emailIntroduzido);
 
             if (clienteAutenticado == null && empregadoAutenticado == null) {
-                System.out.println("\n[REGISTO] E-mail nao reconhecido. A armazenar novo Cliente...");
+                System.out.println("\n[REGISTO] E-mail nao reconhecido.");
+                System.out.print("Como quer ser chamado? (introduza o seu nome): ");
+                String nomeEscolhido = sc.nextLine().trim();
+
+                if (nomeEscolhido.isEmpty()) {
+                    nomeEscolhido = emailIntroduzido;
+                }
+
                 clienteAutenticado = new Cliente(emailIntroduzido);
+                clienteAutenticado.setNomeApresentacao(nomeEscolhido);
                 gestor.registarUtilizador(clienteAutenticado);
-                System.out.println("Conta armazenada com sucesso!");
+                System.out.println("Conta criada com sucesso! Bem-vindo(a), " + nomeEscolhido + "!");
             }
 
             // --- PERFIL CLIENTE ---
             if (clienteAutenticado != null) {
-                System.out.println("\n-> [SESSÃO CLIENTE] Ligado como: " + clienteAutenticado.getNome());
+                String nomeApresentado = clienteAutenticado.getNomeApresentacao() != null
+                        ? clienteAutenticado.getNomeApresentacao()
+                        : clienteAutenticado.getNome();
+
+                System.out.println("\n-> [SESSAO CLIENTE] Ligado como: " + nomeApresentado);
                 Pedido pedido = new Pedido() {};
                 boolean adicionarMais = true;
 
@@ -66,14 +76,18 @@ public class Main {
                     Produto escolhido = gestor.procurarProdutoPorId(idProd);
 
                     if (escolhido != null) {
-                        System.out.print("Quantidade: ");
-                        int qtd = sc.nextInt();
-                        sc.nextLine();
+                        if (!escolhido.isDisponivel()) {
+                            System.out.println("Produto indisponivel de momento.");
+                        } else {
+                            System.out.print("Quantidade: ");
+                            int qtd = sc.nextInt();
+                            sc.nextLine();
 
-                        System.out.print("Notas: ");
-                        String notas = sc.nextLine();
+                            System.out.print("Notas: ");
+                            String notas = sc.nextLine();
 
-                        pedido.adicionarItem(new ItemPedido(escolhido, qtd, notas));
+                            pedido.adicionarItem(new ItemPedido(escolhido, qtd, notas));
+                        }
                     } else {
                         System.out.println("ID de produto invalido!");
                     }
@@ -83,23 +97,30 @@ public class Main {
                     adicionarMais = resposta.equalsIgnoreCase("s");
                 }
 
+                // ALTERADO - associa o nome do cliente ao pedido
+                String nomeParaPedido = clienteAutenticado.getNomeApresentacao() != null
+                        ? clienteAutenticado.getNomeApresentacao()
+                        : clienteAutenticado.getNome();
+                pedido.setNomeCliente(nomeParaPedido);
+
                 gestor.adicionarPedido(pedido);
                 clienteAutenticado.adicionarPedido(pedido);
                 System.out.println("Pedido #" + pedido.getId() + " registado. Total: " + pedido.calcularTotal() + "EUR");
 
             } else if (empregadoAutenticado != null) {
-                // --- PERFIL EMPREGADO (GERENTE) ---
+                // --- PERFIL GERENTE ---
                 boolean sessaoEmpregado = true;
                 while (sessaoEmpregado) {
-                    System.out.println("\n-> [PAINEL GESTÃO] Empregado: " + empregadoAutenticado.getNome());
+                    System.out.println("\n-> [PAINEL GESTAO] Empregado: " + empregadoAutenticado.getNome());
                     System.out.println("1. Ver todos os pedidos do sistema");
                     System.out.println("2. Avancar estado de um pedido");
-                    System.out.println("3. ADICIONAR NOVO PRODUTO AO MENU"); // Nova Opção!
-                    System.out.println("4. Fazer Logout");
+                    System.out.println("3. Adicionar novo produto ao menu");
+                    System.out.println("4. Gerir stock");
+                    System.out.println("5. Fazer Logout");
                     System.out.print("Opcao: ");
 
                     int opcao = sc.nextInt();
-                    sc.nextLine(); // Limpar buffer
+                    sc.nextLine();
 
                     if (opcao == 1) {
                         ArrayList<Pedido> lista = gestor.listarPorOrdemChegada();
@@ -108,10 +129,13 @@ public class Main {
                         } else {
                             System.out.println("\n--- MAPA GERAL DE PEDIDOS ---");
                             for (int i = 0; i < lista.size(); i++) {
-                                System.out.println("Pedido ID: " + lista.get(i).getId() + " [" + lista.get(i).getEstado() + "]");
-                                lista.get(i).listarItens();
+                                Pedido p = lista.get(i);
+                                // ALTERADO - nome do cliente aparece a frente do ID
+                                System.out.println("Pedido ID: " + p.getId() + " | " + p.getNomeCliente() + " [" + p.getEstado() + "]");
+                                p.listarItens();
                             }
                         }
+
                     } else if (opcao == 2) {
                         System.out.print("ID do pedido a alterar: ");
                         int id = sc.nextInt();
@@ -128,19 +152,19 @@ public class Main {
                         } else {
                             System.out.println("O pedido ja se encontra concluido.");
                         }
+
                     } else if (opcao == 3) {
-                        // --- FLUXO PARA ADICIONAR PRODUTO ---
                         System.out.println("\n--- INSERIR NOVO PRODUTO ---");
-                        System.out.print("Introduza um ID unico numérico: ");
+                        System.out.print("Introduza um ID unico numerico: ");
                         int novoId = sc.nextInt();
-                        sc.nextLine(); // Limpar buffer
+                        sc.nextLine();
 
                         System.out.print("Nome do produto: ");
                         String nomeProd = sc.nextLine();
 
-                        System.out.print("Preco (ex: 3,50): ");
+                        System.out.print("Preco (ex: 3.50): ");
                         double precoProd = sc.nextDouble();
-                        sc.nextLine(); // Limpar buffer
+                        sc.nextLine();
 
                         System.out.print("Descricao/Detalhes: ");
                         String descProd = sc.nextLine();
@@ -149,21 +173,68 @@ public class Main {
                         System.out.println("1. BEBIDAS | 2. LANCHES | 3. PETISCOS");
                         System.out.print("Opcao: ");
                         int catOpcao = sc.nextInt();
-                        sc.nextLine(); // Limpar buffer
+                        sc.nextLine();
 
-                        Categoria catEscolhida = Categoria.LANCHES; // Categoria padrão caso falhe
+                        System.out.print("Stock inicial (quantidade disponivel): ");
+                        int stockInicial = sc.nextInt();
+                        sc.nextLine();
+
+                        Categoria catEscolhida = Categoria.LANCHES;
                         if (catOpcao == 1) catEscolhida = Categoria.BEBIDAS;
                         if (catOpcao == 3) catEscolhida = Categoria.PETISCOS;
 
-                        // Cria o novo produto
-                        Produto novoProduto = new Produto(novoId, nomeProd, precoProd, descProd, catEscolhida);
-
-                        // O Empregado adiciona o produto recorrendo ao método do seu diagrama!
+                        Produto novoProduto = new Produto(novoId, nomeProd, precoProd, descProd, catEscolhida, stockInicial);
                         empregadoAutenticado.adicionarProdutoAoMenu(gestor, novoProduto);
-
-                        System.out.println("Sucesso! O produto '" + nomeProd + "' foi adicionado ao menu.");
+                        System.out.println("Sucesso! O produto '" + nomeProd + "' foi adicionado com stock de " + stockInicial + ".");
 
                     } else if (opcao == 4) {
+                        boolean gerirStock = true;
+                        while (gerirStock) {
+                            System.out.println("\n--- GERIR STOCK ---");
+                            gestor.mostrarMenuComStock();
+                            System.out.println("\n1. Adicionar stock a um produto");
+                            System.out.println("2. Marcar produto como indisponivel");
+                            System.out.println("3. Voltar ao menu principal");
+                            System.out.print("Opcao: ");
+
+                            int opcaoStock = sc.nextInt();
+                            sc.nextLine();
+
+                            if (opcaoStock == 1) {
+                                System.out.print("ID do produto: ");
+                                int idProd = sc.nextInt();
+                                sc.nextLine();
+                                Produto prod = gestor.procurarProdutoPorId(idProd);
+                                if (prod == null) {
+                                    System.out.println("Produto nao encontrado.");
+                                } else {
+                                    System.out.print("Quantidade a adicionar: ");
+                                    int qtdAdicionar = sc.nextInt();
+                                    sc.nextLine();
+                                    prod.adicionarStock(qtdAdicionar);
+                                    System.out.println("Stock de '" + prod.getNome() + "' atualizado para " + prod.getStock() + " unidades.");
+                                }
+
+                            } else if (opcaoStock == 2) {
+                                System.out.print("ID do produto a marcar como indisponivel: ");
+                                int idProd = sc.nextInt();
+                                sc.nextLine();
+                                Produto prod = gestor.procurarProdutoPorId(idProd);
+                                if (prod == null) {
+                                    System.out.println("Produto nao encontrado.");
+                                } else {
+                                    prod.marcarIndisponivel();
+                                    System.out.println("Produto '" + prod.getNome() + "' marcado como indisponivel.");
+                                }
+
+                            } else if (opcaoStock == 3) {
+                                gerirStock = false;
+                            } else {
+                                System.out.println("Opcao invalida.");
+                            }
+                        }
+
+                    } else if (opcao == 5) {
                         sessaoEmpregado = false;
                         System.out.println("Logout efetuado.");
                     } else {

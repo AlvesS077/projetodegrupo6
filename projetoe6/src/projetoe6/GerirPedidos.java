@@ -2,7 +2,6 @@ package projetoe6;
 
 import java.util.ArrayList;
 
-// Armazena e disponibiliza a lista de pedidos, utilizadores e produtos do sistema
 public class GerirPedidos {
 
     private ArrayList<Pedido> pedidos;
@@ -14,8 +13,6 @@ public class GerirPedidos {
         this.utilizadoresRegistados = new ArrayList<Utilizador>();
         this.produtos = new ArrayList<Produto>();
     }
-
-    // ---------- Gestao de Utilizadores ----------
 
     public void registarUtilizador(Utilizador u) {
         utilizadoresRegistados.add(u);
@@ -45,8 +42,6 @@ public class GerirPedidos {
         }
         return null;
     }
-
-    // ---------- Gestao de Pedidos ----------
 
     public void adicionarPedido(Pedido p) {
         pedidos.add(p);
@@ -79,8 +74,6 @@ public class GerirPedidos {
         return pedidos.size();
     }
 
-    // ---------- Gestao do Menu (antes na classe Menu) ----------
-
     public void adicionarProduto(Produto p) {
         produtos.add(p);
     }
@@ -90,6 +83,22 @@ public class GerirPedidos {
             Produto p = produtos.get(i);
             System.out.println(p.getId() + ". " + p.getNome() + " (" + p.getCategoria() + ") - " + p.getPreco() + "EUR");
         }
+    }
+
+    public void mostrarMenuComStock() {
+        System.out.println(String.format("%-4s %-20s %-12s %-8s %-10s %s",
+                "ID", "Nome", "Categoria", "Preco", "Stock", "Estado"));
+        System.out.println("--------------------------------------------------------------------");
+        for (int i = 0; i < produtos.size(); i++) {
+            Produto p = produtos.get(i);
+            String estado = p.isDisponivel() ? "disponivel" : "INDISPONIVEL";
+            System.out.println(String.format("%-4d %-20s %-12s %-8.2f %-10d %s",
+                    p.getId(), p.getNome(), p.getCategoria(), p.getPreco(), p.getStock(), estado));
+        }
+    }
+
+    public ArrayList<Produto> getTodosProdutos() {
+        return produtos;
     }
 
     public Produto procurarProdutoPorId(int id) {
@@ -103,7 +112,7 @@ public class GerirPedidos {
 
     public String toString() {
         return "GerirPedidos | Pedidos: " + pedidos.size() +
-               " | Utilizadores: " + utilizadoresRegistados.size() +
-               " | Produtos: " + produtos.size();
+                " | Utilizadores: " + utilizadoresRegistados.size() +
+                " | Produtos: " + produtos.size();
     }
 }

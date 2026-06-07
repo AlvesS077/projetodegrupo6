@@ -8,6 +8,7 @@ public class Produto {
     private String descricao;
     private boolean disponivel;
     private Categoria categoria;
+    private int stock;
 
     public Produto(int id, String nome, double preco, String descricao, Categoria categoria) {
         this.id = id;
@@ -16,46 +17,46 @@ public class Produto {
         this.descricao = descricao;
         this.categoria = categoria;
         this.disponivel = true;
+        this.stock = 10;
     }
 
-    public int getId() {
-        return id;
+    public Produto(int id, String nome, double preco, String descricao, Categoria categoria, int stock) {
+        this.id = id;
+        this.nome = nome;
+        this.preco = preco;
+        this.descricao = descricao;
+        this.categoria = categoria;
+        this.stock = stock;
+        this.disponivel = stock > 0;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public double getPreco() {
-        return preco;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public boolean isDisponivel() {
-        return disponivel;
-    }
+    public int getId() { return id; }
+    public String getNome() { return nome; }
+    public double getPreco() { return preco; }
+    public String getDescricao() { return descricao; }
+    public boolean isDisponivel() { return disponivel; }
+    public Categoria getCategoria() { return categoria; }
+    public int getStock() { return stock; }
 
     public void setDisponivel(boolean d) {
         this.disponivel = d;
     }
 
-    public Categoria getCategoria() {
-        return categoria;
+    public void adicionarStock(int quantidade) {
+        this.stock += quantidade;
+        if (this.stock > 0) {
+            this.disponivel = true;
+        }
+    }
+
+    public void marcarIndisponivel() {
+        this.disponivel = false;
+        this.stock = 0;
     }
 
     @Override
     public String toString() {
-        String estado;
-        if (disponivel) {
-            estado = "disponível";
-        } else {
-            estado = "indisponível";
-        }
-        
-        // Junta tudo com o símbolo + de forma direta e simples
-        return "[" + id + "] " + nome + " - " + preco + "€ (" + descricao + ") [" + estado + "]";
+        String estado = disponivel ? "disponivel" : "indisponivel";
+        return "[" + id + "] " + nome + " - " + preco + "EUR (" + descricao + ") [" + estado + "] | Stock: " + stock;
     }
-} //
+}
