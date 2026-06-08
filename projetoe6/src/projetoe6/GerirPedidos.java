@@ -64,6 +64,13 @@ public class GerirPedidos {
         Pedido p = encontrarPedido(id);
         if (p != null) {
             p.setEstado(EstadoPedido.CONCLUIDO);
+            // Decrementar o stock de cada produto do pedido
+            for (int i = 0; i < p.getItensPedido().size(); i++) {
+                ItemPedido item = p.getItensPedido().get(i);
+                Produto prod = item.getProduto();
+                prod.adicionarStock(-item.getQuantidade());
+                System.out.println("Stock de '" + prod.getNome() + "' atualizado: " + prod.getStock() + " unidades.");
+            }
             System.out.println("Pedido #" + id + " concluido.");
         } else {
             System.out.println("Pedido nao encontrado.");
@@ -86,22 +93,22 @@ public class GerirPedidos {
     }
 
     public void mostrarMenuComStock() {
-        // Cabeçalho feito com espaços normais para alinhar com os dados abaixo
-        System.out.println("ID    Nome                 Categoria    Preco    Stock    Estado");
+
+        System.out.println(String.format("%-4s %-20s %-12s %-8s %-10s %s",
+
+                "ID", "Nome", "Categoria", "Preco", "Stock", "Estado"));
+
         System.out.println("--------------------------------------------------------------------");
 
         for (int i = 0; i < produtos.size(); i++) {
+
             Produto p = produtos.get(i);
 
             String estado = p.isDisponivel() ? "disponivel" : "INDISPONIVEL";
 
-            // Código limpo: apenas as variáveis juntas por espaços normais dentro de aspas
-            System.out.println(p.getId() + "     " +
-                    p.getNome() + "         " +
-                    p.getCategoria() + "    " +
-                    p.getPreco() + " EUR    " +
-                    p.getStock() + "        " +
-                    estado);
+            System.out.println(String.format("%-4d %-20s %-12s %-8.2f %-10d %s",
+
+                    p.getId(), p.getNome(), p.getCategoria(), p.getPreco(), p.getStock(), estado));
         }
     }
 

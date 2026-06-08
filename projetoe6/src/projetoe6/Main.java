@@ -64,7 +64,7 @@ public class Main {
                         : clienteAutenticado.getNome();
 
                 System.out.println("\n-> [SESSAO CLIENTE] Ligado como: " + nomeApresentado);
-                Pedido pedido = new Pedido() {};
+                PedidoDigital pedido = new PedidoDigital(); // <-- ALTERADO
                 boolean adicionarMais = true;
 
                 while (adicionarMais) {
@@ -83,13 +83,20 @@ public class Main {
                             int qtd = sc.nextInt();
                             sc.nextLine();
 
-                            System.out.print("Notas: ");
-                            String notas = sc.nextLine();
-
-                            pedido.adicionarItem(new ItemPedido(escolhido, qtd, notas));
+                            if (qtd <= 0) {                              // <-- NOVO
+                                System.out.println("Quantidade invalida.");
+                            } else if (qtd > escolhido.getStock()) {    // <-- NOVO
+                                System.out.println("Stock insuficiente. Disponivel: " + escolhido.getStock());
+                            } else {
+                                System.out.print("Notas: ");
+                                String notas = sc.nextLine();
+                                pedido.adicionarItem(new ItemPedido(escolhido, qtd, notas));
+                                System.out.println("Item adicionado ao pedido.");
+                            }
                         }
                     } else {
                         System.out.println("ID de produto invalido!");
+                        sc.nextLine(); // <-- NOVO (evita loop infinito)
                     }
 
                     System.out.print("Adicionar mais produtos? (s/n): ");
@@ -97,15 +104,28 @@ public class Main {
                     adicionarMais = resposta.equalsIgnoreCase("s");
                 }
 
-                // ALTERADO - associa o nome do cliente ao pedido
+                // Associa o nome do cliente ao pedido
                 String nomeParaPedido = clienteAutenticado.getNomeApresentacao() != null
                         ? clienteAutenticado.getNomeApresentacao()
                         : clienteAutenticado.getNome();
                 pedido.setNomeCliente(nomeParaPedido);
 
-                gestor.adicionarPedido(pedido);
-                clienteAutenticado.adicionarPedido(pedido);
-                System.out.println("Pedido #" + pedido.getId() + " registado. Total: " + pedido.calcularTotal() + "EUR");
+                // Mostrar resumo e pedir pagamento          // <-- NOVO BLOCO
+                System.out.println("\n--- RESUMO DO PEDIDO #" + pedido.getId() + " ---");
+                pedido.listarItens();
+                System.out.printf("Total a pagar: %.2f EUR%n", pedido.calcularTotal());
+                System.out.print("Confirmar pagamento? (s/n): ");
+                String confirmPag = sc.next();
+                sc.nextLine();
+
+                if (confirmPag.equalsIgnoreCase("s")) {
+                    pedido.confirmarPagamento();
+                    gestor.adicionarPedido(pedido);
+                    clienteAutenticado.adicionarPedido(pedido);
+                    System.out.println("Pedido #" + pedido.getId() + " registado com sucesso!");
+                } else {
+                    System.out.println("Pagamento cancelado. Pedido nao registado.");
+                }
 
             } else if (empregadoAutenticado != null) {
                 // --- PERFIL GERENTE ---
@@ -130,7 +150,6 @@ public class Main {
                             System.out.println("\n--- MAPA GERAL DE PEDIDOS ---");
                             for (int i = 0; i < lista.size(); i++) {
                                 Pedido p = lista.get(i);
-                                // ALTERADO - nome do cliente aparece a frente do ID
                                 System.out.println("Pedido ID: " + p.getId() + " | " + p.getNomeCliente() + " [" + p.getEstado() + "]");
                                 p.listarItens();
                             }

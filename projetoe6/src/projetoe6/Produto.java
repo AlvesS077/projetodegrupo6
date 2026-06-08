@@ -44,9 +44,8 @@ public class Produto {
 
     public void adicionarStock(int quantidade) {
         this.stock += quantidade;
-        if (this.stock > 0) {
-            this.disponivel = true;
-        }
+        if (this.stock < 0) this.stock = 0;
+        this.disponivel = this.stock > 0;
     }
 
     public void marcarIndisponivel() {
