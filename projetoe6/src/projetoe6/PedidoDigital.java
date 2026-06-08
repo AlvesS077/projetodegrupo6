@@ -1,10 +1,9 @@
 package projetoe6;
 
-// Subclasse de Pedido que representa um pedido feito digitalmente
-// Guarda e controla apenas se o pedido ja se encontra pago
+
 public class PedidoDigital extends Pedido {
 
-    private boolean pago; // Indica se o pedido ja foi pago
+    private boolean pago;
 
     // Construtor - define o pedido inicialmente como nao pago
     public PedidoDigital() {

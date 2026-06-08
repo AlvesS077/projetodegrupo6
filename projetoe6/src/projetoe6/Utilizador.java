@@ -1,6 +1,6 @@
 package projetoe6;
 
-// Classe abstrata base para Cliente e Empregado
+
 public abstract class Utilizador {
 
     private String nome;

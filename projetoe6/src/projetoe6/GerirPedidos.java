@@ -86,14 +86,22 @@ public class GerirPedidos {
     }
 
     public void mostrarMenuComStock() {
-        System.out.println(String.format("%-4s %-20s %-12s %-8s %-10s %s",
-                "ID", "Nome", "Categoria", "Preco", "Stock", "Estado"));
+        // Cabeçalho feito com espaços normais para alinhar com os dados abaixo
+        System.out.println("ID    Nome                 Categoria    Preco    Stock    Estado");
         System.out.println("--------------------------------------------------------------------");
+
         for (int i = 0; i < produtos.size(); i++) {
             Produto p = produtos.get(i);
+
             String estado = p.isDisponivel() ? "disponivel" : "INDISPONIVEL";
-            System.out.println(String.format("%-4d %-20s %-12s %-8.2f %-10d %s",
-                    p.getId(), p.getNome(), p.getCategoria(), p.getPreco(), p.getStock(), estado));
+
+            // Código limpo: apenas as variáveis juntas por espaços normais dentro de aspas
+            System.out.println(p.getId() + "     " +
+                    p.getNome() + "         " +
+                    p.getCategoria() + "    " +
+                    p.getPreco() + " EUR    " +
+                    p.getStock() + "        " +
+                    estado);
         }
     }
 

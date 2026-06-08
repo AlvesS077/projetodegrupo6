@@ -10,14 +10,14 @@ public abstract class Pedido {
     private String dataHora;
     private EstadoPedido estado;
     private ArrayList<ItemPedido> itensPedido;
-    private String nomeCliente;  // NOVO
+    private String nomeCliente;
 
     public Pedido() {
         this.id = proximoId++;
         this.dataHora = new java.util.Date().toString();
         this.estado = EstadoPedido.PENDENTE;
         this.itensPedido = new ArrayList<ItemPedido>();
-        this.nomeCliente = "Desconhecido";  // NOVO
+        this.nomeCliente = "Desconhecido";
     }
 
     public int getId() {
