@@ -2,8 +2,14 @@ package projetoe6;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class Main {
+
+    // Senha de acesso ao painel do empregado
+    private static final String SENHA_EMPREGADO   = "empregado123";
+    // Senha de acesso ao mapa mensal
+    private static final String SENHA_MAPA_MENSAL = "bar2025";
 
     public static void main(String[] args) {
 
@@ -64,7 +70,7 @@ public class Main {
                         : clienteAutenticado.getNome();
 
                 System.out.println("\n-> [SESSAO CLIENTE] Ligado como: " + nomeApresentado);
-                PedidoDigital pedido = new PedidoDigital(); // <-- ALTERADO
+                PedidoDigital pedido = new PedidoDigital();
                 boolean adicionarMais = true;
 
                 while (adicionarMais) {
@@ -83,9 +89,9 @@ public class Main {
                             int qtd = sc.nextInt();
                             sc.nextLine();
 
-                            if (qtd <= 0) {                              // <-- NOVO
+                            if (qtd <= 0) {
                                 System.out.println("Quantidade invalida.");
-                            } else if (qtd > escolhido.getStock()) {    // <-- NOVO
+                            } else if (qtd > escolhido.getStock()) {
                                 System.out.println("Stock insuficiente. Disponivel: " + escolhido.getStock());
                             } else {
                                 System.out.print("Notas: ");
@@ -96,7 +102,7 @@ public class Main {
                         }
                     } else {
                         System.out.println("ID de produto invalido!");
-                        sc.nextLine(); // <-- NOVO (evita loop infinito)
+                        sc.nextLine();
                     }
 
                     System.out.print("Adicionar mais produtos? (s/n): ");
@@ -104,13 +110,11 @@ public class Main {
                     adicionarMais = resposta.equalsIgnoreCase("s");
                 }
 
-                // Associa o nome do cliente ao pedido
                 String nomeParaPedido = clienteAutenticado.getNomeApresentacao() != null
                         ? clienteAutenticado.getNomeApresentacao()
                         : clienteAutenticado.getNome();
                 pedido.setNomeCliente(nomeParaPedido);
 
-                // Mostrar resumo e pedir pagamento          // <-- NOVO BLOCO
                 System.out.println("\n--- RESUMO DO PEDIDO #" + pedido.getId() + " ---");
                 pedido.listarItens();
                 System.out.printf("Total a pagar: %.2f EUR%n", pedido.calcularTotal());
@@ -128,15 +132,39 @@ public class Main {
                 }
 
             } else if (empregadoAutenticado != null) {
+                // --- AUTENTICACAO POR SENHA DO EMPREGADO ---
+                boolean senhaCorreta = false;
+                boolean voltarLogin = false;
+                while (!senhaCorreta && !voltarLogin) {
+                    System.out.println("\n--- ACESSO AO PAINEL DO EMPREGADO ---");
+                    System.out.print("Introduza a senha de empregado: ");
+                    String senhaEmp = sc.nextLine();
+
+                    if (senhaEmp.equals(SENHA_EMPREGADO)) {
+                        senhaCorreta = true;
+                    } else {
+                        System.out.println("\n[ERRO] Senha incorreta. Tente novamente.");
+                        System.out.println("1. Tentar novamente");
+                        System.out.println("2. Voltar ao login por email");
+                        System.out.print("Opcao: ");
+                        String opcaoErroEmp = sc.nextLine().trim();
+                        if (opcaoErroEmp.equals("2")) {
+                            voltarLogin = true;
+                            System.out.println("A regressar ao login...");
+                        }
+                    }
+                }
+
                 // --- PERFIL GERENTE ---
-                boolean sessaoEmpregado = true;
+                boolean sessaoEmpregado = senhaCorreta;
                 while (sessaoEmpregado) {
                     System.out.println("\n-> [PAINEL GESTAO] Empregado: " + empregadoAutenticado.getNome());
                     System.out.println("1. Ver todos os pedidos do sistema");
                     System.out.println("2. Avancar estado de um pedido");
                     System.out.println("3. Adicionar novo produto ao menu");
                     System.out.println("4. Gerir stock");
-                    System.out.println("5. Fazer Logout");
+                    System.out.println("5. Ver mapa mensal");   // <-- NOVA OPCAO
+                    System.out.println("6. Fazer Logout");
                     System.out.print("Opcao: ");
 
                     int opcao = sc.nextInt();
@@ -254,6 +282,51 @@ public class Main {
                         }
 
                     } else if (opcao == 5) {
+                        // --- MAPA MENSAL COM AUTENTICACAO POR SENHA ---
+                        boolean voltarMenuPrincipal = false;
+                        while (!voltarMenuPrincipal) {
+                            System.out.println("\n--- ACESSO AO MAPA MENSAL ---");
+                            System.out.print("Introduza a senha de acesso: ");
+                            String senhaIntroduzida = sc.nextLine();
+
+                            if (senhaIntroduzida.equals(SENHA_MAPA_MENSAL)) {
+                                // Senha correta: pedir mes e ano
+                                Calendar agora = Calendar.getInstance();
+                                int mesAtual = agora.get(Calendar.MONTH) + 1;
+                                int anoAtual = agora.get(Calendar.YEAR);
+
+                                System.out.print("Mes (1-12) [ENTER para mes atual " + mesAtual + "]: ");
+                                String inputMes = sc.nextLine().trim();
+                                int mesEscolhido = inputMes.isEmpty() ? mesAtual : Integer.parseInt(inputMes);
+
+                                System.out.print("Ano [ENTER para ano atual " + anoAtual + "]: ");
+                                String inputAno = sc.nextLine().trim();
+                                int anoEscolhido = inputAno.isEmpty() ? anoAtual : Integer.parseInt(inputAno);
+
+                                // Validar mes
+                                if (mesEscolhido < 1 || mesEscolhido > 12) {
+                                    System.out.println("Mes invalido. Tem de ser entre 1 e 12.");
+                                } else {
+                                    MapaMensal.imprimirMapaMensal(gestor.listarPorOrdemChegada(), mesEscolhido, anoEscolhido);
+                                }
+                                voltarMenuPrincipal = true; // Apos ver o mapa, volta ao menu
+
+                            } else {
+                                // Senha errada
+                                System.out.println("\n[ERRO] Senha incorreta. Tente novamente.");
+                                System.out.println("1. Tentar novamente");
+                                System.out.println("2. Voltar ao menu");
+                                System.out.print("Opcao: ");
+                                String opcaoErro = sc.nextLine().trim();
+                                if (opcaoErro.equals("2")) {
+                                    voltarMenuPrincipal = true;
+                                    System.out.println("A regressar ao menu...");
+                                }
+                                // Se escolher 1 (ou qualquer outra coisa), repete o loop e pede senha de novo
+                            }
+                        }
+
+                    } else if (opcao == 6) {
                         sessaoEmpregado = false;
                         System.out.println("Logout efetuado.");
                     } else {

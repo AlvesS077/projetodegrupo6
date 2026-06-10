@@ -1,20 +1,21 @@
 package projetoe6;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public abstract class Pedido {
 
     private static int proximoId = 1;
 
     private int id;
-    private String dataHora;
+    private Date dataHoraBruta;       // <-- Alterado: guardado como Date em vez de String
     private EstadoPedido estado;
     private ArrayList<ItemPedido> itensPedido;
     private String nomeCliente;
 
     public Pedido() {
         this.id = proximoId++;
-        this.dataHora = new java.util.Date().toString();
+        this.dataHoraBruta = new Date();  // <-- Alterado
         this.estado = EstadoPedido.PENDENTE;
         this.itensPedido = new ArrayList<ItemPedido>();
         this.nomeCliente = "Desconhecido";
@@ -24,8 +25,14 @@ public abstract class Pedido {
         return id;
     }
 
+    // Mantido para compatibilidade - devolve a data formatada como String
     public String getDataHora() {
-        return dataHora;
+        return dataHoraBruta.toString();
+    }
+
+    // Novo metodo: devolve o objeto Date original (necessario para o MapaMensal)
+    public Date getDataHoraBruta() {
+        return dataHoraBruta;
     }
 
     public EstadoPedido getEstado() {
@@ -36,12 +43,10 @@ public abstract class Pedido {
         this.estado = estado;
     }
 
-    // NOVO
     public String getNomeCliente() {
         return nomeCliente;
     }
 
-    // NOVO
     public void setNomeCliente(String nome) {
         this.nomeCliente = nome;
     }
@@ -73,6 +78,6 @@ public abstract class Pedido {
     }
 
     public String toString() {
-        return "Pedido #" + id + " | " + nomeCliente + " | " + dataHora + " | Estado: " + estado + " | Total: " + calcularTotal() + "EUR";
+        return "Pedido #" + id + " | " + nomeCliente + " | " + getDataHora() + " | Estado: " + estado + " | Total: " + calcularTotal() + "EUR";
     }
 }
