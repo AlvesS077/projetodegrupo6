@@ -8,14 +8,14 @@ public abstract class Pedido {
     private static int proximoId = 1;
 
     private int id;
-    private Date dataHoraBruta;       // <-- Alterado: guardado como Date em vez de String
+    private Date dataHoraBruta;
     private EstadoPedido estado;
     private ArrayList<ItemPedido> itensPedido;
     private String nomeCliente;
 
     public Pedido() {
         this.id = proximoId++;
-        this.dataHoraBruta = new Date();  // <-- Alterado
+        this.dataHoraBruta = new Date();
         this.estado = EstadoPedido.PENDENTE;
         this.itensPedido = new ArrayList<ItemPedido>();
         this.nomeCliente = "Desconhecido";
@@ -80,4 +80,4 @@ public abstract class Pedido {
     public String toString() {
         return "Pedido #" + id + " | " + nomeCliente + " | " + getDataHora() + " | Estado: " + estado + " | Total: " + calcularTotal() + "EUR";
     }
-}
+}//
